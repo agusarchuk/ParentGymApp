@@ -23,6 +23,27 @@ import SwiftData
 
 enum SampleData {
 
+    /// Builds a fresh, temporary, already-seeded in-memory database — used
+    /// ONLY by Xcode Previews (the `#Preview` blocks at the bottom of each
+    /// screen file).
+    ///
+    /// Previews never run `GymTrackerApp.swift` (your app's real entry
+    /// point), so the `.task { SampleData.seedIfNeeded(...) }` line there
+    /// never executes for a preview. Without this helper, a preview's
+    /// database would be completely empty — no Ana, no Leo — which is
+    /// exactly the "why don't I see the students in the preview" mismatch.
+    @MainActor
+    static func previewContainer() -> ModelContainer {
+        let schema = Schema([ChildProfile.self, Package.self, AttendanceRecord.self])
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+
+        // Safe to force-try here: this only ever runs inside Xcode's
+        // preview canvas, never in the shipped app.
+        let container = try! ModelContainer(for: schema, configurations: [configuration])
+        seedIfNeeded(context: container.mainContext)
+        return container
+    }
+
     /// Fills the local database with example data, but only if it is
     /// completely empty (so we never overwrite real data on later launches).
     static func seedIfNeeded(context: ModelContext) {

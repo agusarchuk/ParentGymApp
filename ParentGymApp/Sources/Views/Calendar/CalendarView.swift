@@ -223,5 +223,5 @@ private struct DayCell: View {
 
 #Preview {
     RootView()
-        .modelContainer(for: [ChildProfile.self, Package.self, AttendanceRecord.self], inMemory: true)
+        .modelContainer(SampleData.previewContainer())
 }
